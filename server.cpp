@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "sockets/sockets.h"
+#include "utils_server.h"
 
 int main()
 {
@@ -50,7 +51,6 @@ int main()
         select(std::max(listener.get_fd(), sock_UDP.get_fd()) + 1, &sock_set, NULL, NULL, NULL);
         
         if(FD_ISSET(listener.get_fd(), &sock_set)) {
-
             socket_TCP sock_TCP = listener.accept();
 
             if(!sock_TCP.is_valid())
@@ -70,9 +70,9 @@ int main()
                     break;
                 }
 
+                std::cout << "Message statistic:\n" << get_statistic(buf, bytes_read);
                 sock_TCP.send(buf, bytes_read);
             }
-            continue;
         }
 
         if (FD_ISSET(sock_UDP.get_fd(), &sock_set)) {
@@ -81,7 +81,9 @@ int main()
                 std::cerr << "Receive UDP pack error.\nReason: " << listener.get_er_message() << std::endl;
                 continue;
             } else if (bytes_read) {
+                std::cout << "Message statistic:\n" << get_statistic(buf, bytes_read);
                 int n = sock_UDP.send(buf, bytes_read);
+                
                 if (n < 0) {
                     std::cerr << "Send UDP pack error.\nReason: " << listener.get_er_message() << std::endl;
                     continue;
@@ -89,6 +91,7 @@ int main()
 
                 if (!sock_UDP.disconect()) {
                     std::cerr << "Disconect UDP socket error.\nReason: " << listener.get_er_message() << std::endl;
+                    continue;
                 }
             }
         }

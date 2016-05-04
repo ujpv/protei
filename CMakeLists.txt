@@ -5,7 +5,7 @@ add_definitions(-std=c++11)
 project(client_server)    
 
 set(SOURCE_CLIENT client.cpp)    
-set(SOURCE_SERVER server.cpp)
+set(SOURCE_SERVER server.cpp utils_server.cpp)
 
 include_directories(sockets)
 

@@ -45,7 +45,15 @@ bool abstract_socket::bind(const char * const ip, uint16_t port)
 
 int abstract_socket::send(const char *buf, int size)
 {
-    return ::send(m_fd, buf, size, 0);
+    int sent_total = 0;
+    while (size > sent_total) {
+        int sent = ::send(m_fd, buf + sent_total, size - sent_total, 0);
+        if (sent == -1) {
+            return -1;
+        }
+        sent_total += sent;    
+    }
+    return sent_total;
 }
 
 bool abstract_socket::connect(const char *ip, uint16_t port)

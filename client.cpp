@@ -48,7 +48,10 @@ int main(int argc, char **argv)
 
     for (;;) {
         std::string s;
-        std::cin >> s;
+        std::getline(std::cin, s);
+        if (!s.size()) {
+            continue;
+        }
         int byte_count = sock->send(s.c_str(), s.size());
         if (byte_count < 0) {
             std::cerr << "Sending failed.\nReason: " << sock->get_er_message() << std::endl;

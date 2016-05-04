@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 
-#include "utils.h"
+#include "utils_server.h"
 
 std::string get_statistic(char *buf, int size) {
     std::stringstream ss;
@@ -16,7 +16,7 @@ std::string get_statistic(char *buf, int size) {
     }
 
     if (!digits.size()) {
-        return std::string();
+        return std::string("No digits.\n");
     }
 
     std::sort(digits.begin(), digits.end());
@@ -28,7 +28,7 @@ std::string get_statistic(char *buf, int size) {
 
     ss << "Sum: " << std::accumulate(digits.begin(), digits.end(), 0) << '\n';
 
-    ss << "Minimum: " << *digits.begin() << "\nMaximum: " << *digits.end() << '\n'; 
+    ss << "Minimum: " << digits.front() << "\nMaximum: " << digits.back() << '\n'; 
 
     return ss.str();
 }
