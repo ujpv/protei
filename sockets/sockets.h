@@ -36,19 +36,7 @@ public:
 };
 
 //====================================================================================================
-
-class socket_TCP: public abstract_socket
-{
-public:
-    socket_TCP();
-    socket_TCP(socket_TCP const &other);
-    socket_TCP &operator=(socket_TCP const &other);
-    explicit socket_TCP(int f_d);
-    int receive(char *buf, int size) override;
-    ~socket_TCP() override;
-};
-
-//====================================================================================================
+class socket_TCP;
 
 class socket_TCP_listener: public abstract_socket {
 public:
@@ -62,6 +50,21 @@ public:
 
 private:
     int m_queue_size;
+};
+
+//====================================================================================================
+
+class socket_TCP: public abstract_socket
+{
+public:
+    socket_TCP();
+    socket_TCP(socket_TCP const &other);
+    socket_TCP &operator=(socket_TCP const &other);
+    int receive(char *buf, int size) override;
+    ~socket_TCP() override;
+    friend socket_TCP socket_TCP_listener::accept();
+private:
+    explicit socket_TCP(int f_d);
 };
 
 #endif // SOCKETS_H
