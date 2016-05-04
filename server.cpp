@@ -4,40 +4,42 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#include "sockets.h"
-
 #include <iostream>
 
-uint16_t const port = 6061;
-char const localhost_ip[] = "127.0.0.1"; 
+#include "sockets/sockets.h"
 
 int main()
 {
-    socket_TCP_listener listener(9);
+    uint16_t const port = 6061;
+    char const localhost_ip[] = "127.0.0.1"; 
+    int const BUF_SIZE = 66561; //65kb + 1b
+    
+    socket_TCP_listener listener(10);
     if(!listener.is_valid())
     {
-        std::cerr << "Error TCP socket\n" << listener.get_er_message();
+        std::cerr << "Creating TCP socket error.\nReason: " << listener.get_er_message() << std::endl;
         return 1;
     }
 
     socket_UDP sock_UDP;
     if (!sock_UDP.is_valid()) {
-        std::cerr << "Error UDP socket1\n" << sock_UDP.get_er_message();
+        std::cerr << "Creating UDP socket error.\nReason: " << sock_UDP.get_er_message() << std::endl;
         return 1;
     }
 
     if (!listener.bind(localhost_ip , port)) {
-        std::cerr << "Error TCP bind\n" << listener.get_er_message();
+        std::cerr << "Bind TCP socket error.\nReason: " << listener.get_er_message() << std::endl;
         return 1;
     }
 
     if (!sock_UDP.bind(localhost_ip, port)) {
-        std::cerr << "Error UDP bind\n" << listener.get_er_message();
+        std::cerr << "Bind UDP socket error.\nReason: " << sock_UDP.get_er_message() << std::endl;
         return 1;
     }
 
-    char buf[1025];
-    int bytes_read;
+    char buf[BUF_SIZE];
+    int bytes_read = 0;
+
     for(;;)
     {
         fd_set sock_set;
@@ -53,21 +55,21 @@ int main()
 
             if(!sock_TCP.is_valid())
             {
-                std::cerr << "Error accept\n" << listener.get_er_message();
+                std::cerr << "Accept error\nReason: " << listener.get_er_message() << std::endl;
                 continue;
             }
 
-
             for(;;)
             {
-                bytes_read = sock_TCP.receive(buf, 1024);
+                bytes_read = sock_TCP.receive(buf, BUF_SIZE);
 
                 if (bytes_read < 0) {
-                    std::cerr << "Error receive TCP pack.\n" << listener.get_er_message();
+                    std::cerr << "Receive TCP pack error.\nReason: " << listener.get_er_message() << std::endl;
                     continue;
+                } else if(bytes_read == 0) { 
+                    break;
                 }
 
-                if(bytes_read == 0) break;
                 sock_TCP.send(buf, bytes_read);
             }
             continue;
@@ -76,22 +78,20 @@ int main()
         if (FD_ISSET(sock_UDP.get_fd(), &sock_set)) {
             bytes_read = sock_UDP.receive(buf, 1024);
             if (bytes_read < 0) {
-                std::cerr << "Error receive UDP pack.\n" << listener.get_er_message();
+                std::cerr << "Receive UDP pack error.\nReason: " << listener.get_er_message() << std::endl;
                 continue;
-            }
-            if (bytes_read) {
+            } else if (bytes_read) {
                 int n = sock_UDP.send(buf, bytes_read);
                 if (n < 0) {
-                    std::cerr << "Error send UDP pack.\n" << listener.get_er_message();
+                    std::cerr << "Send UDP pack error.\nReason: " << listener.get_er_message() << std::endl;
                     continue;
                 }
-                if (!sock_UDP.disconect()) {
-                    std::cerr << "Error disconect UDP pack.\n" << listener.get_er_message();
-                }
 
+                if (!sock_UDP.disconect()) {
+                    std::cerr << "Disconect UDP socket error.\nReason: " << listener.get_er_message() << std::endl;
+                }
             }
         }
     }
-
     return 0;
 }

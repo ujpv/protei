@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "sockets.h"
+
 //============================abstact_socket==================================
 
 abstract_socket::abstract_socket(int fd)
@@ -122,7 +123,6 @@ socket_TCP & socket_TCP::operator=(socket_TCP const &other) {
     return *this;
 }
 
-//delete this!!!!!!!!!!!!!!!!!11
 socket_TCP::socket_TCP(int f_d)
     : abstract_socket(f_d) {}
 

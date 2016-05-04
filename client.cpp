@@ -3,7 +3,7 @@
 #include <cstring>
 #include <memory>
 
-#include "sockets.h"
+#include "sockets/sockets.h"
 
 int main(int argc, char **argv)
 {
@@ -36,8 +36,8 @@ int main(int argc, char **argv)
 
     std::unique_ptr<abstract_socket> sock(tmp);
 
-    if (sock->get_fd() < 0) {
-        std::cerr << "Connection socket.\nReason: " << sock->get_er_message() << std::endl;
+    if (!sock->is_valid()) {
+        std::cerr << "Creating socket error.\nReason: " << sock->get_er_message() << std::endl;
         return 1;
     }
 
