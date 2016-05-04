@@ -19,14 +19,13 @@ std::string get_statistic(char *buf, int size) {
         return std::string("No digits.\n");
     }
 
-    std::sort(digits.begin(), digits.end());
+    std::sort(digits.begin(), digits.end(), std::greater<int>());
     ss << "Sorted: ";
     for (int &d: digits) {
         ss << d << ' ';
     }
-    ss << '\n';
 
-    ss << "Sum: " << std::accumulate(digits.begin(), digits.end(), 0) << '\n';
+    ss << "\nSum: " << std::accumulate(digits.begin(), digits.end(), 0) << '\n';
 
     ss << "Minimum: " << digits.front() << "\nMaximum: " << digits.back() << '\n'; 
 
